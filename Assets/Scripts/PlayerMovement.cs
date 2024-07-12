@@ -19,6 +19,7 @@ public class PlayerMovement : MonoBehaviour
     void Update()
     {
         Run();
+        FlipSprite();
 
     }
 
@@ -35,7 +36,18 @@ public class PlayerMovement : MonoBehaviour
 
      }
 
+     void FlipSprite()
+    {
+        bool playerHorizontalSpeed = Mathf.Abs(myRigidbody.velocity.x)> Mathf.Epsilon;
+        
+        if (playerHorizontalSpeed)
 
+        {
+        
+        transform.localScale = new Vector2(Mathf.Sign(myRigidbody.velocity.x),1f);
+        }
+        
+    }
 
 
 
