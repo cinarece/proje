@@ -7,10 +7,20 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float runSpeed = 10f;
     private Vector2 moveInput;
     private Rigidbody2D myRigidbody;
+    
+    private Vector2 screenBounds;
+    private float objectWidth;
+    private float objectHeight;
+    private Camera mainCamera;
 
     void Start()
     {
         myRigidbody = GetComponent<Rigidbody2D>();
+        mainCamera = Camera.main;
+
+        screenBounds = mainCamera.ScreenToWorldPoint(new Vector3(Screen.width, Screen.height, mainCamera.transform.position.z));
+        objectWidth = GetComponent<SpriteRenderer>().bounds.extents.x; // yarı genişlik
+        objectHeight = GetComponent<SpriteRenderer>().bounds.extents.y; // yarı yükseklik
     }
 
     void Update()
@@ -18,6 +28,7 @@ public class PlayerMovement : MonoBehaviour
         ProcessInputs();
         Run();
         FlipSprite();
+        ClampPosition();
     }
 
     private void ProcessInputs()
@@ -47,7 +58,7 @@ public class PlayerMovement : MonoBehaviour
 
     private void Run()
     {
-        Vector2 playerVelocity = new Vector2(moveInput.x * runSpeed, myRigidbody.velocity.y);
+        Vector2 playerVelocity = new Vector2(moveInput.x * runSpeed, moveInput.y * runSpeed);
         myRigidbody.velocity = playerVelocity;
     }
 
@@ -59,5 +70,13 @@ public class PlayerMovement : MonoBehaviour
         {
             transform.localScale = new Vector2(Mathf.Sign(myRigidbody.velocity.x), 1f);
         }
+    }
+
+    private void ClampPosition()
+    {
+        Vector3 viewPos = transform.position;
+        viewPos.x = Mathf.Clamp(viewPos.x, screenBounds.x * -1 + objectWidth, screenBounds.x - objectWidth);
+        viewPos.y = Mathf.Clamp(viewPos.y, screenBounds.y * -1 + objectHeight, screenBounds.y - objectHeight);
+        transform.position = viewPos;
     }
 }
